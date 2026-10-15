@@ -1,0 +1,2459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Mohammed Hyder Shareef — Applied AI &amp; Data Science</title>
+  <meta name="description" content="Portfolio of Mohammed Hyder Shareef — Applied AI and Data Science student at IIT Jodhpur &amp; Leapstart School of Technology. Engineering machine intelligence, resilient database architectures, secure networks, and high-impact digital experiences.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #000;
+      --ink: #f4f2ef;
+      --dim: #8c8783;
+      --line: rgba(244, 242, 239, 0.28);
+      --pad: clamp(14px, 2.6vw, 34px);
+      --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+      --hw: min(56vw, 640px);
+      --persp: 1150px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --tap: 44px;
+      --serif: "Playfair Display", "Times New Roman", serif;
+      --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      background: #000;
+      scrollbar-gutter: stable;
+    }
+
+    body {
+      background: #000;
+      color: var(--ink);
+      font-family: var(--sans);
+      font-weight: 300;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+      min-height: 100vh;
+      min-height: 100dvh;
+      overscroll-behavior-y: none;
+    }
+
+    body.locked {
+      overflow: hidden;
+      height: 100vh;
+      height: 100dvh;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    button {
+      font: inherit;
+      color: inherit;
+      background: none;
+      border: none;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* 1. SCROLL TRACK (116vh = 16vh scrollable dolly) */
+    #scrolltrack {
+      height: 116vh;
+      pointer-events: none;
+      visibility: hidden;
+    }
+
+    /* 2. 3D STAGE */
+    #stage {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      perspective: var(--persp);
+      perspective-origin: 50% 50%;
+      overflow: hidden;
+      touch-action: none;
+      transition: opacity 0.6s var(--ease), filter 0.6s var(--ease);
+    }
+
+    @media (pointer: coarse) {
+      #stage {
+        touch-action: pan-y;
+      }
+    }
+
+    body.gridview #stage {
+      opacity: 0;
+      filter: blur(14px);
+      pointer-events: none;
+    }
+
+    #world {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    #orb {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 0;
+      transform-style: preserve-3d;
+      opacity: 1;
+      transform: none;
+    }
+
+    #headline {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: var(--hw);
+      margin-left: calc(var(--hw) / -2);
+      text-align: center;
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: clamp(25px, 3.7vw, 55px);
+      line-height: 1.06;
+      letter-spacing: -0.005em;
+      color: #fff;
+      text-shadow: 0 2px 34px rgba(0, 0, 0, 0.65);
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    #headline .inner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      transform: translateY(-50%);
+    }
+
+    #headline .inner span {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(0.42em);
+      filter: blur(7px);
+      transition: opacity 1.05s var(--ease), transform 1.15s var(--ease), filter 1.05s var(--ease);
+    }
+
+    body.revealed #headline .inner span {
+      opacity: 1;
+      transform: none;
+      filter: blur(0);
+      transition-delay: calc(0.9s + var(--i) * 0.085s);
+    }
+
+    /* CARDS ON 3D FIBONACCI SPHERE */
+    .card {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: var(--cw);
+      height: calc(var(--cw) / 1.5);
+      margin-left: calc(var(--cw) / -2);
+      margin-top: calc(var(--cw) / -3);
+      transform-style: preserve-3d;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .card.tall {
+      height: calc(var(--cw) * 1.25);
+      margin-top: calc(var(--cw) * -0.625);
+    }
+
+    .card figure {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 4px;
+      background: #0a0a0a;
+      transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .card:hover figure {
+      transform: scale(1.055);
+      border-color: rgba(255, 255, 255, 0.35);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 255, 255, 0.1);
+    }
+
+    .card figure::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, var(--d, 0));
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+      border-radius: 4px;
+      pointer-events: none;
+    }
+
+    .card figure .card-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 3px 7px;
+      border-radius: 3px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #f4f2ef;
+      backdrop-filter: blur(4px);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .card figure .card-label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 16px 8px 6px;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 500;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      display: block;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .card img.in {
+      opacity: 1;
+    }
+
+    body.revealed .card img {
+      transition: opacity 0.8s ease-out;
+    }
+
+    /* 3. VIGNETTE */
+    .vig {
+      position: fixed;
+      inset: 0;
+      z-index: 12;
+      pointer-events: none;
+      background: radial-gradient(ellipse 88% 92% at 50% 50%, transparent 48%, rgba(0, 0, 0, 0.35) 80%, rgba(0, 0, 0, 0.85) 100%);
+      transition: opacity 0.6s var(--ease);
+    }
+
+    body.gridview .vig,
+    body.lit .vig {
+      opacity: 0;
+    }
+
+    /* 4. FLAT GRID */
+    #grid {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: #000;
+      padding: calc(var(--pad) * 3.4) var(--pad) calc(var(--pad) * 4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s var(--ease);
+    }
+
+    body.gridview #grid {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #grid .grid-header {
+      max-width: 1680px;
+      margin: 0 auto 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 12px;
+    }
+
+    #grid .grid-header h2 {
+      font-family: var(--serif);
+      font-size: clamp(24px, 2.5vw, 36px);
+      font-weight: 400;
+      color: #fff;
+    }
+
+    #grid .grid-header span {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+
+    #grid .rows {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: clamp(12px, 1.6vw, 24px);
+      max-width: 1680px;
+      margin: 0 auto;
+    }
+
+    #grid figure {
+      position: relative;
+      aspect-ratio: 3/2;
+      border-radius: 4px;
+      background: #0b0b0b;
+      cursor: pointer;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: border-color 0.3s;
+    }
+
+    #grid figure:hover {
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+
+    #grid img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.82;
+      transition: transform 0.8s var(--ease), opacity 0.8s var(--ease);
+    }
+
+    #grid figure:hover img {
+      transform: scale(1.05);
+      opacity: 1;
+    }
+
+    #grid figcaption {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 34px 16px 14px;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.6) 60%, transparent 100%);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.35s var(--ease), transform 0.35s var(--ease);
+      pointer-events: none;
+    }
+
+    #grid figcaption .fig-title {
+      font-family: var(--serif);
+      font-size: 16px;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    #grid figcaption .fig-sub {
+      font-size: 11px;
+      color: rgba(244, 242, 239, 0.65);
+      letter-spacing: 0.03em;
+    }
+
+    #grid figure:hover figcaption {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* 5. CHROME (Header, Bio, Colophon, Cue, Grid Toggle) */
+    .chrome {
+      opacity: 0;
+      transition: opacity 1.2s var(--ease) 0.15s, transform 0.6s var(--ease);
+    }
+
+    body.revealed .chrome {
+      opacity: 1;
+    }
+
+    /* HEADER */
+    header.chrome {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 60;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: calc(var(--pad) * 0.8 + var(--safe-top)) calc(var(--pad) + var(--safe-right)) calc(var(--pad) * 0.35) calc(var(--pad) + var(--safe-left));
+      mix-blend-mode: difference;
+      pointer-events: none;
+    }
+
+    header.chrome * {
+      pointer-events: auto;
+    }
+
+    body.menu-open header.chrome {
+      z-index: 90;
+      mix-blend-mode: normal;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    a.wordmark {
+      font-family: var(--serif);
+      font-size: clamp(20px, 2.2vw, 28px);
+      letter-spacing: 0.02em;
+      line-height: 1;
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    a.wordmark em {
+      font-style: normal;
+    }
+
+    body.menu-open a.wordmark {
+      color: #f4f2ef;
+    }
+
+    /* STATUS BADGE */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 9.5px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(244, 242, 239, 0.22);
+      background: rgba(0, 0, 0, 0.45);
+      color: rgba(244, 242, 239, 0.8);
+      backdrop-filter: blur(8px);
+    }
+
+    .status-badge .dot-ind {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #4ade80;
+      box-shadow: 0 0 8px #4ade80;
+    }
+
+    /* MENU BUTTON */
+    button#menuBtn.menu-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 5px;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 8px 0 4px;
+    }
+
+    span.menu-label {
+      font-size: clamp(12px, 1.25vw, 15px);
+      letter-spacing: 0.01em;
+      color: #fff;
+      transition: opacity 0.35s var(--ease);
+    }
+
+    body.menu-open span.menu-label {
+      opacity: 0;
+    }
+
+    span.bars {
+      position: relative;
+      width: clamp(42px, 4.4vw, 62px);
+      height: clamp(16px, 2vw, 22px);
+    }
+
+    span.bars i {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 1px;
+      background: #fff;
+      transition: transform 0.4s var(--ease), width 0.4s var(--ease);
+    }
+
+    body.menu-open span.bars i {
+      background: #f4f2ef;
+    }
+
+    span.bars i:nth-child(1) {
+      transform: translateY(-5px);
+    }
+
+    span.bars i:nth-child(2) {
+      width: clamp(34px, 3.6vw, 50px);
+      left: auto;
+      transform: translateY(5px);
+    }
+
+    button#menuBtn:hover span.bars i:nth-child(2) {
+      transform: translateY(5px) translateX(-8px);
+    }
+
+    body.menu-open span.bars i:nth-child(1) {
+      width: 100%;
+      transform: translateY(0) rotate(45deg);
+    }
+
+    body.menu-open span.bars i:nth-child(2) {
+      width: 100%;
+      transform: translateY(0) rotate(-45deg);
+    }
+
+    /* CREATOR / BIO CARD */
+    .bio.chrome {
+      position: fixed;
+      left: calc(var(--pad) + var(--safe-left));
+      bottom: calc(var(--pad) + var(--safe-bottom));
+      z-index: 55;
+      max-width: min(340px, 46vw);
+      transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+    }
+
+    .bio .who {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .avatar-crest {
+      width: 48px;
+      height: 48px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: grid;
+      place-items: center;
+      font-family: var(--serif);
+      font-size: 18px;
+      font-weight: 500;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    .bio b {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: 19px;
+      letter-spacing: 0.01em;
+      color: #fff;
+      display: block;
+    }
+
+    .bio .role-tag {
+      font-size: 10.5px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(244, 242, 239, 0.55);
+      margin-top: 2px;
+      display: block;
+    }
+
+    .bio p {
+      font-size: 12.5px;
+      line-height: 1.62;
+      color: rgba(244, 242, 239, 0.75);
+    }
+
+    body.deep .bio.chrome,
+    body.gridview .bio.chrome,
+    body.lit .bio.chrome {
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+    }
+
+    /* COLOPHON */
+    .colophon.chrome {
+      position: fixed;
+      right: calc(var(--pad) + var(--safe-right));
+      bottom: calc(var(--pad) + var(--safe-bottom));
+      z-index: 55;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      color: rgba(244, 242, 239, 0.65);
+      transition: opacity 0.4s var(--ease);
+    }
+
+    body.gridview .colophon.chrome,
+    body.lit .colophon.chrome {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* GRID TOGGLE BUTTON */
+    button#gridBtn.gridbtn {
+      position: fixed;
+      left: calc(var(--pad) + var(--safe-left));
+      bottom: calc(var(--pad) + var(--safe-bottom));
+      z-index: 56;
+      width: 44px;
+      height: 44px;
+      padding: 5px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+    }
+
+    button#gridBtn.gridbtn b {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: #f4f2ef;
+      border-radius: 2px;
+      transition: transform 0.3s var(--ease), background 0.3s var(--ease);
+    }
+
+    body.deep button#gridBtn.gridbtn,
+    body.gridview button#gridBtn.gridbtn {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    button#gridBtn.gridbtn:hover b {
+      background: #fff;
+      transform: scale(0.86);
+    }
+
+    body.gridview button#gridBtn.gridbtn b:nth-child(1) {
+      transform: translate(3px, 3px);
+    }
+
+    body.gridview button#gridBtn.gridbtn b:nth-child(4) {
+      transform: translate(-3px, -3px);
+    }
+
+    /* SCROLL CUE */
+    .cue.chrome {
+      position: fixed;
+      left: 50%;
+      bottom: calc(var(--pad) + var(--safe-bottom) + 4px);
+      transform: translateX(-50%);
+      z-index: 54;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.24em;
+      color: rgba(244, 242, 239, 0.42);
+      white-space: nowrap;
+      pointer-events: none;
+      transition: opacity 0.4s var(--ease);
+    }
+
+    .cue s {
+      display: block;
+      width: 44px;
+      height: 1px;
+      background: rgba(244, 242, 239, 0.28);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cue s::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: #f4f2ef;
+      animation: sweep 2.6s var(--ease) infinite;
+    }
+
+    @keyframes sweep {
+      0% { transform: translateX(-100%); }
+      55% { transform: translateX(0%); }
+      100% { transform: translateX(100%); }
+    }
+
+    body.deep .cue.chrome,
+    body.gridview .cue.chrome,
+    body.lit .cue.chrome {
+      opacity: 0;
+    }
+
+    /* 6. FULLSCREEN MENU */
+    #menu {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: #050505;
+      display: grid;
+      place-items: center;
+      clip-path: inset(0 0 100% 0);
+      pointer-events: none;
+      transition: clip-path 0.85s var(--ease);
+    }
+
+    body.menu-open #menu {
+      clip-path: inset(0);
+      pointer-events: auto;
+    }
+
+    #menu nav {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(4px, 1vw, 10px);
+      text-align: center;
+    }
+
+    #menu nav a {
+      font-family: var(--serif);
+      font-size: clamp(30px, 6.8vw, 68px);
+      line-height: 1.1;
+      color: #f4f2ef;
+      opacity: 0.55;
+      transition: opacity 0.3s var(--ease), letter-spacing 0.3s var(--ease);
+    }
+
+    #menu nav a:hover {
+      opacity: 1;
+      letter-spacing: 0.012em;
+    }
+
+    #menu .menu-socials {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    #menu .menu-socials a {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      padding: 7px 16px;
+      border: 1px solid rgba(244, 242, 239, 0.25);
+      border-radius: 999px;
+      color: rgba(244, 242, 239, 0.8);
+      transition: all 0.3s;
+    }
+
+    #menu .menu-socials a:hover {
+      background: #f4f2ef;
+      color: #000;
+      border-color: #f4f2ef;
+    }
+
+    #menu .addr {
+      position: absolute;
+      left: calc(var(--pad) + var(--safe-left));
+      right: calc(var(--pad) + var(--safe-right));
+      bottom: calc(var(--pad) + var(--safe-bottom));
+      font-size: 12.5px;
+      color: var(--dim);
+      line-height: 1.7;
+      text-align: center;
+    }
+
+    /* 7. LIGHTBOX */
+    #lit {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      display: grid;
+      place-items: center;
+      padding: clamp(56px, 8vh, 84px) var(--pad);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.42s var(--ease);
+    }
+
+    body.lit #lit {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #lit .scrim {
+      position: absolute;
+      inset: 0;
+      cursor: pointer;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    #lit .plate {
+      position: relative;
+      width: min(72vw, 860px, calc((100vh - 230px) * 1.5));
+      max-height: 90vh;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.2) transparent;
+      transition: transform 0.62s var(--ease), opacity 0.42s var(--ease);
+      z-index: 2;
+    }
+
+    #lit .shot {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 3/2;
+      border-radius: 4px;
+      background: #0b0b0b;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.85);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    #lit .shot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+
+    #lit .close-btn {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 10px 16px;
+      border: 1px solid rgba(244, 242, 239, 0.78);
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.5);
+      color: #f4f2ef;
+      backdrop-filter: blur(8px);
+      transition: border-color 0.25s, background 0.25s;
+    }
+
+    #lit .close-btn:hover {
+      border-color: #fff;
+      background: rgba(0, 0, 0, 0.75);
+    }
+
+    #lit .meta {
+      display: grid;
+      grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+      gap: clamp(22px, 3.2vw, 48px);
+      padding: 24px 22px 22px;
+      background: rgba(12, 12, 16, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      margin-top: 14px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    #litTitle {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: clamp(24px, 2.3vw, 34px);
+      line-height: 1.08;
+      letter-spacing: -0.01em;
+      margin-bottom: 6px;
+      color: #fff;
+    }
+
+    #litWhere {
+      font-size: 13px;
+      color: rgba(244, 242, 239, 0.65);
+      margin-bottom: 12px;
+    }
+
+    #litNote {
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: rgba(244, 242, 239, 0.92);
+    }
+
+    #litExtra {
+      margin-top: 14px;
+      font-size: 12.5px;
+      line-height: 1.6;
+      color: rgba(244, 242, 239, 0.82);
+    }
+
+    #litExtra .section-sub {
+      margin-top: 10px;
+      color: rgba(244, 242, 239, 0.95);
+    }
+
+    .tech-tags, #litTags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .tech-tag {
+      display: inline-block;
+      font-size: 10.5px;
+      letter-spacing: 0.04em;
+      padding: 4px 9px;
+      border-radius: 4px;
+      background: rgba(244, 242, 239, 0.08);
+      border: 1px solid rgba(244, 242, 239, 0.18);
+      color: rgba(244, 242, 239, 0.9);
+      white-space: nowrap;
+    }
+
+    .repo-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      border: 1px solid rgba(244, 242, 239, 0.45);
+      border-radius: 999px;
+      color: #f4f2ef;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .repo-link:hover {
+      background: #f4f2ef;
+      color: #000;
+    }
+
+    /* 8. INTRO FILM */
+    #intro {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: #000;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    #film {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #intro .veil {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      opacity: 0;
+      transition: opacity 1.15s var(--ease);
+      pointer-events: none;
+    }
+
+    #intro.closing .veil {
+      opacity: 1;
+    }
+
+    #intro.gone {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s linear;
+    }
+
+    button.skip#skip {
+      position: absolute;
+      right: calc(var(--pad) + var(--safe-right));
+      bottom: calc(var(--pad) + var(--safe-bottom));
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(244, 242, 239, 0.7);
+      min-height: 44px;
+      padding: 10px 18px;
+      border: 1px solid rgba(244, 242, 239, 0.3);
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+      transition: color 0.3s, border-color 0.3s, opacity 0.3s;
+      z-index: 2;
+    }
+
+    button.skip#skip:hover {
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.8);
+    }
+
+    #intro.closing button.skip#skip {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #intro .fallback {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 46%, #0f172a 0%, #030712 48%, #000 80%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #intro.novideo .fallback {
+      opacity: 1;
+    }
+
+    /* 9. SPLASH SCREEN */
+    #splash {
+      position: fixed;
+      inset: 0;
+      z-index: 250;
+      background: #000;
+      display: grid;
+      place-items: center;
+      align-content: center;
+      gap: 26px;
+      transition: opacity 0.6s var(--ease);
+    }
+
+    #splash.out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #splash .mark {
+      font-family: var(--serif);
+      font-size: clamp(28px, 4.4vw, 52px);
+      letter-spacing: 0.01em;
+      color: #f4f2ef;
+      opacity: 0;
+      animation: riseIn 1.25s var(--ease) 0.15s forwards;
+    }
+
+    #splash .mark em {
+      font-style: normal;
+    }
+
+    #splash .bar {
+      width: clamp(120px, 17vw, 210px);
+      height: 1px;
+      background: rgba(244, 242, 239, 0.16);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #splash s#bar {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: #f4f2ef;
+      transform-origin: left;
+      transform: scaleX(0);
+      transition: transform 0.55s var(--ease);
+    }
+
+    #splash .tag {
+      font-size: 10px;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      color: rgba(244, 242, 239, 0.45);
+      opacity: 0;
+      animation: riseIn 0.9s var(--ease) 0.7s forwards;
+    }
+
+    @keyframes riseIn {
+      from {
+        opacity: 0;
+        transform: translateY(9px);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* 10. CUSTOM CURSOR */
+    #dot {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 19px;
+      height: 19px;
+      margin: -9.5px 0 0 -9.5px;
+      border-radius: 50%;
+      background: rgba(214, 212, 209, 0.9);
+      mix-blend-mode: difference;
+      border: 1px solid transparent;
+      pointer-events: none;
+      z-index: 300;
+      transition: width 0.35s var(--ease), height 0.35s var(--ease), margin 0.35s var(--ease), background 0.35s var(--ease), border-color 0.35s var(--ease);
+      will-change: transform;
+    }
+
+    #dot.wide {
+      width: 52px;
+      height: 52px;
+      margin: -26px 0 0 -26px;
+      background: rgba(244, 242, 239, 0.14);
+      border: 1px solid rgba(244, 242, 239, 0.75);
+    }
+
+    @media (hover: none) or (pointer: coarse) {
+      #dot {
+        display: none !important;
+      }
+    }
+
+    /* RESPONSIVE BREAKPOINTS */
+    @media (max-width: 900px) {
+      .bio.chrome {
+        max-width: min(420px, calc(100vw - var(--pad) * 2 - var(--safe-left) - var(--safe-right)));
+      }
+      .bio p {
+        font-size: 12px;
+      }
+      .colophon.chrome {
+        font-size: 11px;
+      }
+      #lit .meta {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding-top: 14px;
+      }
+      #lit .plate {
+        width: min(92vw, calc((100dvh - 220px) * 1.5));
+      }
+      #grid .rows {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      }
+      #grid {
+        padding-top: calc(var(--pad) * 2.8 + var(--safe-top));
+      }
+    }
+
+    @media (max-width: 768px) {
+      .colophon.chrome {
+        display: none;
+      }
+      .bio.chrome {
+        max-width: calc(100vw - var(--pad) * 2 - var(--safe-left) - var(--safe-right));
+      }
+      #headline {
+        font-size: clamp(22px, 6.4vw, 34px);
+      }
+      #menu nav a {
+        font-size: clamp(26px, 8vw, 50px);
+      }
+      #menu .addr {
+        font-size: 11.5px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      :root {
+        --hw: min(84vw, 360px);
+        --pad: clamp(12px, 4vw, 18px);
+      }
+      .avatar-crest {
+        width: 40px;
+        height: 40px;
+        font-size: 15px;
+      }
+      .bio b {
+        font-size: 17px;
+      }
+      .bio p {
+        font-size: 11.5px;
+        line-height: 1.55;
+      }
+      .cue.chrome {
+        display: none;
+      }
+      #lit {
+        display: block;
+        overflow-y: auto;
+        padding: calc(52px + var(--safe-top)) calc(var(--pad) + var(--safe-right)) calc(var(--pad) + var(--safe-bottom)) calc(var(--pad) + var(--safe-left));
+      }
+      #lit .plate {
+        width: 100%;
+        max-width: 560px;
+        margin: 0 auto;
+      }
+      #litTitle {
+        font-size: clamp(20px, 5.6vw, 26px);
+      }
+      #litNote {
+        font-size: 12.5px;
+        line-height: 1.58;
+      }
+      #lit .close-btn {
+        top: 8px;
+        right: 8px;
+      }
+      #grid {
+        padding: calc(var(--pad) * 3 + var(--safe-top)) calc(var(--pad) + var(--safe-right)) calc(var(--pad) * 2 + var(--safe-bottom)) calc(var(--pad) + var(--safe-left));
+      }
+      #grid .rows {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+      #grid figcaption {
+        opacity: 1;
+        transform: none;
+        padding: 20px 10px 8px;
+      }
+      #grid figcaption .fig-title {
+        font-size: 13px;
+      }
+      #grid figcaption .fig-sub {
+        font-size: 10px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      :root {
+        --hw: min(88vw, 320px);
+      }
+      .bio .who {
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .bio p {
+        display: none;
+      }
+      #grid .rows {
+        grid-template-columns: 1fr;
+      }
+      #menu nav {
+        gap: 2px;
+      }
+      #menu nav a {
+        font-size: clamp(22px, 9vw, 38px);
+      }
+    }
+
+    @media (max-height: 520px) and (orientation: landscape) {
+      .bio.chrome,
+      .colophon.chrome,
+      .cue.chrome {
+        display: none;
+      }
+      #headline {
+        font-size: clamp(18px, 4.8vh, 28px);
+      }
+      header.chrome {
+        padding-top: calc(8px + var(--safe-top));
+      }
+      #lit {
+        padding-top: calc(36px + var(--safe-top));
+      }
+      #lit .meta {
+        padding-top: 10px;
+      }
+      #lit .plate {
+        width: min(58vw, calc((100dvh - 80px) * 1.5));
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.14s !important;
+      }
+    }
+  </style>
+</head>
+<body class="locked">
+
+  <!-- 1. SCROLL TRACK (16vh dolly range) -->
+  <div id="scrolltrack"></div>
+
+  <!-- 2. 3D STAGE & WORLD -->
+  <div id="stage">
+    <div id="world">
+      <div id="orb"></div>
+      <h1 id="headline">
+        <span class="inner">
+          <span style="--i:0">Between</span>
+          <span style="--i:1">Systems</span>
+          <span style="--i:2">and</span>
+          <span style="--i:3">Human</span>
+          <span style="--i:4">Experience</span>
+        </span>
+      </h1>
+    </div>
+  </div>
+
+  <!-- 3. VIGNETTE -->
+  <div class="vig"></div>
+
+  <!-- 4. FLAT GRID -->
+  <div id="grid">
+    <div class="grid-header">
+      <h2>The Architectural Archive</h2>
+      <span>21 Portfolios &amp; Case Studies</span>
+    </div>
+    <div class="rows" id="gridRows"></div>
+  </div>
+
+  <!-- 5. CHROME ELEMENTS -->
+  <header class="chrome">
+    <div class="header-left">
+      <a href="#" class="wordmark" id="brandWordmark" aria-label="Mohammed Hyder Shareef">HYDER<em>®</em></a>
+      <div class="status-badge" aria-label="Current Availability Status">
+        <span class="dot-ind"></span>
+        <span>AVAILABLE TO BUILD · 2026</span>
+      </div>
+    </div>
+    <button id="menuBtn" class="menu-btn" aria-expanded="false" aria-controls="menu" aria-label="Open menu">
+      <span class="menu-label">Menu</span>
+      <span class="bars">
+        <i></i>
+        <i></i>
+      </span>
+    </button>
+  </header>
+
+  <!-- CREATOR BIO CARD -->
+  <aside class="bio chrome">
+    <div class="who">
+      <div class="avatar-crest">H®</div>
+      <div>
+        <b id="bioName">Mohammed Hyder Shareef</b>
+        <span class="role-tag">Applied AI &amp; Data Science · IIT Jodhpur</span>
+      </div>
+    </div>
+    <p id="bioText">
+      Engineering machine intelligence, resilient database architectures, secure networks, and computational craft. Bridging technical rigor in systems with charismatic storytelling.
+    </p>
+  </aside>
+
+  <!-- COLOPHON -->
+  <div class="colophon chrome" id="colophonText">HYDER® · Active 2026</div>
+
+  <!-- GRID VIEW TOGGLE BUTTON -->
+  <button id="gridBtn" class="gridbtn" aria-label="Toggle grid view">
+    <b></b><b></b><b></b><b></b>
+  </button>
+
+  <!-- ROTATION CUE -->
+  <div class="cue chrome">
+    <s></s>
+    <span>Drag to rotate</span>
+  </div>
+
+  <!-- 6. FULLSCREEN MENU -->
+  <div id="menu">
+    <nav>
+      <a href="#archive" data-grid>The Archive (All Works)</a>
+      <a href="#projects" data-close-menu>Selected Case Studies</a>
+      <a href="#experience" data-close-menu>Residencies &amp; Experience</a>
+      <a href="#credentials" data-close-menu>Foundations &amp; Credentials</a>
+      <a href="#contact" data-close-menu>Contact Coordinates</a>
+    </nav>
+    <div class="menu-socials">
+      <a href="https://github.com/Hyder-Shareef" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="https://www.linkedin.com/in/mohammed-hyder-shareef-61116a361/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      <a href="mailto:shareefhyder321@gmail.com">Direct Inquiry</a>
+    </div>
+    <div class="addr" id="menuAddr">
+      Hyderabad, Telangana, India · Asia/Kolkata (IST UTC+5:30)<br>
+      shareefhyder321@gmail.com
+    </div>
+  </div>
+
+  <!-- 7. FLIP LIGHTBOX -->
+  <div id="lit">
+    <div class="scrim" data-close></div>
+    <div class="plate" id="litPlate">
+      <div class="shot">
+        <img id="litImg" alt="Dossier detail">
+        <button class="close-btn" data-close aria-label="Close dialog">Close</button>
+      </div>
+      <div class="meta">
+        <div>
+          <h2 id="litTitle">Title</h2>
+          <div class="where" id="litWhere">Subtitle · Category</div>
+          <div id="litTags" class="tech-tags"></div>
+          <div id="litRepo"></div>
+        </div>
+        <div>
+          <div class="note" id="litNote">Overview note</div>
+          <div class="extra" id="litExtra"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. INTRO VEIL -->
+  <div id="intro">
+    <div class="veil"></div>
+  </div>
+
+  <!-- 9. SPLASH SCREEN -->
+  <div id="splash">
+    <div class="mark" id="splashMark">HYDER<em>®</em></div>
+    <div class="bar">
+      <s id="bar"></s>
+    </div>
+    <div class="tag" id="splashTag">Applied AI &amp; Systems · 2026</div>
+  </div>
+
+  <!-- 10. CUSTOM CURSOR -->
+  <div id="dot"></div>
+
+  <!-- JAVASCRIPT BEHAVIOR -->
+  <script>
+    (function () {
+      "use strict";
+
+
+      // 21 HIGH-RESOLUTION TECH ASSETS MAPPED DIRECTLY TO THE DOSSIER
+      const TECH_IMAGES = [
+        // 1. KYNTRA: F1 Telemetry, Kinematics, Energy Dynamics
+        "assets/01_kyntra_f1.jpg",
+        // 2. HEAULT: Personal Health Records, Clinical OCR, Bio Vault
+        "assets/02_heault_health.jpg",
+        // 3. OMNIS: Geospatial Planetary Atmosphere, Live Flight Arcs
+        "assets/03_omnis_geospatial.jpg",
+        // 4. PROJECTIRIS: AI Threat Detection, SOC Network Topology
+        "assets/04_projectiris_cyber.jpg",
+        // 5. ARCHON: Autonomous Multi-Agent Framework, Swarm Nodes
+        "assets/05_archon_agent_ai.jpg",
+        // 6. LIBRARY SYSTEM: PostgreSQL ACID Resource Catalog
+        "assets/06_library_acid.jpg",
+        // 7. DATABASE SYSTEMS: Relational Schemas & Financial Banking Engines
+        "assets/07_database_servers.jpg",
+        // 8. LEAPSTART RESIDENCY: Full-Stack Systems & API Engineering
+        "assets/08_leapstart_code.jpg",
+        // 9. SKILLSYNTH: Community Lead & Developer Circles
+        "assets/09_skillsynth_kanban.jpg",
+        // 10. FLYRANK AI: LLM Workflows & Prompt Optimization
+        "assets/10_flyrank_chip_ai.jpg",
+        // 11. 0xSHUNYA: Cybersecurity Research & Linux Hardening
+        "assets/11_0xshunya_terminal.jpg",
+        // 12. IIT JODHPUR: B.S. in Applied AI and Data Science
+        "assets/12_iit_campus.jpg",
+        // 13. LEAPSTART FELLOWSHIP: Enterprise Software Engineering
+        "assets/13_leapstart_team.jpg",
+        // 14. ONE MILLION PROMPTERS: Dubai Government Credential
+        "assets/14_dubai_prompters.jpg",
+        // 15. DELOITTE AUSTRALIA: Data Analytics Job Simulation
+        "assets/15_deloitte_analytics.jpg",
+        // 16. ANTHROPIC AI FLUENCY: LLM Systems & Safety
+        "assets/16_anthropic_gradient.jpg",
+        // 17. MICROSOFT SOC PROGRAM: Security Operations Foundations
+        "assets/17_microsoft_soc.jpg",
+        // 18. TECHNICAL DEMOS: Precision & Clarity in 60 Seconds
+        "assets/18_demos_keynote.jpg",
+        // 19. STAND-UP COMEDY: Stage Timing, Narrative & Charisma (TALL)
+        "assets/19_comedy_stage.jpg",
+        // 20. COMMUNITY LEADERSHIP: Hackathon Sprints & Mentoring
+        "assets/20_community_hack.jpg",
+        // 21. 48-HOUR RIGOR: Rapid Full-Stack AI Prototyping
+        "assets/21_rigor_sprint.jpg"
+      ];
+
+      // 21 CASE STUDIES & DOSSIER RECORDS
+      const DOSSIER_ITEMS = [
+        {
+          badge: "F1 AI / SIMULATION",
+          title: "KYNTRA",
+          place: "Auditable F1 Energy & Overtake Intelligence · 2026",
+          note: "Auditable Formula 1 decision-support prototype analyzing high-frequency telemetry, circuit geometry, powertrain energy dynamics, opponent behaviors, and regulatory compliance to evaluate overtake feasibility score.",
+          problem: "Formula 1 race engineers must evaluate high-velocity overtake decisions under strict battery energy limits, opponent defense profiles, and complex FIA regulatory boundaries in split seconds.",
+          approach: "Engineered an auditable multi-stage decision pipeline combining circuit coordinate raycasting, powertrain state-of-charge simulations, counterfactual trajectory comparison, and fail-safe freshness gates.",
+          capabilities: [
+            "High-Frequency Telemetry Ingestion & Real-Time Race State Synchronization",
+            "Kinematic Circuit Geometry & Powertrain ERS State-of-Charge Simulation",
+            "Opponent Behavior Modeling & Counterfactual Trajectory Comparison",
+            "Lexicographic Strategic Ranking evaluating overtake feasibility score",
+            "Fail-Safe Regulation Gates: Defaults to ABSTAIN on ambiguous or stale telemetry"
+          ],
+          tech: ["Python 3.11+", "FastAPI", "TypeScript", "Kinematics", "Telemetry Analytics", "Decision Pipelines"],
+          repo: "https://github.com/Hyder-Shareef/Kyntra_f1-"
+        },
+        {
+          badge: "HEALTHTECH / AI",
+          title: "HEAULT",
+          place: "Personal Health Records Platform · 2026",
+          note: "Health-tech platform transforming fragmented paper prescriptions, lab panels, and imaging scans into structured, searchable digital health timelines with automated OCR document processing, privacy-first AI summarization, and emergency QR access.",
+          problem: "Patients and caregivers struggle with fragmented physical paper prescriptions, lost test records, and complex medical jargon during emergency room visits.",
+          approach: "Engineered a zero-friction mobile and web architecture utilizing cloud OCR pipelines to extract clinical parameters, medication dosages, and vital diagnoses into categorized chronological health timelines.",
+          capabilities: [
+            "OCR Document Ingestion for prescriptions, discharge summaries, and lab panels",
+            "AI Clinical Synthesizer generating concise patient-friendly summaries and warnings",
+            "Emergency QR Access protocol with rapid cryptographic access for first responders",
+            "Automated Medication Schedule & Dosage reminders with offline-first SQLite cache"
+          ],
+          tech: ["React Native", "Expo SDK 51", "Node.js", "MongoDB Atlas", "Azure Document Intelligence", "LLMs"],
+          repo: "https://github.com/Abuubaida-Assad/Archon"
+        },
+        {
+          badge: "GEOSPATIAL / WEBGL",
+          title: "OMNIS",
+          place: "Global Telemetry & Atmosphere Monitor · 2026",
+          note: "Interactive 3D WebGL planetary canvas aggregating real-time streaming spatial data: atmospheric particulate heatmaps (AQI), live commercial flight vector Bezier altitude arcs, and breaking geographic news alerts.",
+          problem: "Monitoring disjointed planetary sensors, global atmospheric quality, and air traffic requires switching between numerous disparate dashboards.",
+          approach: "Designed a single-canvas WebGL orbital sphere mapping multi-layered spatial data with custom GLSL atmosphere and glow shaders, powered by Web Workers for coordinate normalization.",
+          capabilities: [
+            "3D Interactive Earth Sphere with smooth mouse raycasting and orbital zoom",
+            "Live Flight Paths visualized as dynamic 3D altitude arcs with speed indicators",
+            "Air Quality Index (AQI) particle heatmaps from worldwide sensor networks",
+            "Time-scrubbing telemetry playback for atmospheric dispersion analysis"
+          ],
+          tech: ["JavaScript", "Three.js", "GLSL Shaders", "WebSockets", "GeoJSON", "Node.js"],
+          repo: "https://github.com/Abuubaida-Assad/Archon"
+        },
+        {
+          badge: "CYBERSECURITY / ML",
+          title: "PROJECTIRIS",
+          place: "AI Threat Detection & Security Topology · 2026",
+          note: "Automated network telemetry inspection system utilizing machine learning classification models to isolate anomalous packet flows, DDoS signatures, and privilege escalation attempts before intrusion vectors propagate.",
+          problem: "Modern enterprise perimeter attacks execute faster than manual SOC operator triage times, overwhelming analysts with false-positive alerts.",
+          approach: "Constructed an intelligent threat scoring engine paired with an interactive network node topology map that visually highlights compromised subnets and isolates infected hosts.",
+          capabilities: [
+            "Real-time Network Topology visualizer with animated packet pulse flows",
+            "AI Anomaly Classifier ranking threat severity with confidence score rationale",
+            "Automated Incident Quarantine triggers for rapid firewall rule deployment",
+            "Forensic Timeline Generator for post-incident root cause analysis"
+          ],
+          tech: ["React 18", "Node.js", "MongoDB", "Python ML", "Socket.io", "Threat Intelligence"],
+          repo: "https://github.com/Abuubaida-Assad/Archon"
+        },
+        {
+          badge: "MULTI-AGENT SWARM",
+          title: "ARCHON",
+          place: "Autonomous Multi-Agent AI Framework · 2026",
+          note: "Multi-agent coordination architecture designed for autonomous task decomposition, dynamic tool compilation, and resilient consensus execution across distributed LLM swarms.",
+          problem: "Single-prompt LLM execution fails on complex multi-step technical challenges due to hallucination loops, lack of validation, and context window saturation.",
+          approach: "Constructed an event-driven agent consensus topology where specialized Planner, Executor, and Critic agents validate intermediate steps through sandbox execution before committing final state changes.",
+          capabilities: [
+            "Hierarchical Swarm Architecture with Planner, Executor, and Critic roles",
+            "Dynamic Tool Provisioning enabling agents to compile runtime sandboxed tools",
+            "Memory Consensus Graph with semantic vector retrieval across agent sessions",
+            "Automated Self-Correction loops that re-evaluate failed executions autonomously"
+          ],
+          tech: ["TypeScript", "Python", "LangGraph", "Vector DB", "OpenAI / Claude API", "Node.js"],
+          repo: "https://github.com/Abuubaida-Assad/Archon"
+        },
+        {
+          badge: "FULL STACK / ACID",
+          title: "LIBRARY SYSTEM",
+          place: "Resource Catalog & Circulations · 2025",
+          note: "Enterprise resource circulation management platform built with strict ACID compliance, dynamic inventory queries, trigger-based penalty computation routines, and student borrowing lifecycle tracking.",
+          problem: "Manual and legacy library systems suffer from data inconsistencies, uncollected overdue penalties, and sluggish multi-criteria search capabilities.",
+          approach: "Designed a normalized PostgreSQL relational database backend with trigger-based penalty computation and an intuitive React search & reservation interface.",
+          capabilities: [
+            "Multi-Parameter ISBN & Title Cataloging with instant full-text filtering",
+            "Automated Circulations Desk: Instant checkouts, reservations, and renewals",
+            "Penalty & Overdue Calculation engine with automated notification dispatch",
+            "Role-Based Access Control (RBAC) separating Librarian and Member permissions"
+          ],
+          tech: ["React", "PostgreSQL", "Node.js", "Express REST", "Tailwind CSS"],
+          repo: "https://github.com/Abuubaida-Assad/Archon"
+        },
+        {
+          badge: "DBMS / RELATIONAL",
+          title: "DATABASE SYSTEMS",
+          place: "Relational Schemas & Financial Engines · 2025",
+          note: "Suite of mission-critical relational architectures: double-entry ledger banking engines, hierarchical employee org charts, and university admission workflows built with strict 3NF/BCNF normalization.",
+          problem: "Poor relational architecture leads to data anomalies, orphaned records, calculation errors in financial ledgers, and slow analytical reporting.",
+          approach: "Engineered 3NF/BCNF normalized schemas, database triggers, foreign-key constraint enforcement, and ACID transaction boundaries ensuring 100% data integrity.",
+          capabilities: [
+            "Double-Entry Banking Ledger with balance integrity constraints and atomic transfers",
+            "Hierarchical Employee & Payroll Engine calculating tax, deductions, and reporting tiers",
+            "University Admissions Pipeline with criteria verification and merit rank allocation",
+            "Complex SQL Analytical Queries using Window functions, CTEs, and Index tuning"
+          ],
+          tech: ["PostgreSQL 16", "PL/pgSQL", "Transactions", "Stored Procedures", "Triggers", "Index Tuning"],
+          repo: "https://github.com/Abuubaida-Assad/Archon"
+        },
+        {
+          badge: "RESIDENCY",
+          title: "LEAPSTART SCHOOL OF TECH",
+          place: "Student Trainee · Technical Residency (2025 — Present)",
+          note: "Project-based intensive residency in full-stack web development, database architecture, APIs, and algorithmic problem solving. Engineered real-world applications leveraging React, JavaScript, Node.js, and PostgreSQL.",
+          capabilities: [
+            "Engineered full-stack applications with React, PostgreSQL, and Express REST APIs",
+            "Delivered rigorous technical demos, system walkthroughs, and peer architecture reviews",
+            "Applied strict API testing methodologies with Postman and automated pipelines"
+          ],
+          tech: ["React", "JavaScript", "PostgreSQL", "Postman", "API Engineering", "System Demos"]
+        },
+        {
+          badge: "LEADERSHIP",
+          title: "SKILLSYNTH",
+          place: "Community Lead · Leadership & Outreach (2026)",
+          note: "Drove technical outreach, member engagement, and peer-to-peer developer learning circles in Hyderabad. Facilitated collaborative coding initiatives, hackathon prep groups, and interactive technical workshops.",
+          capabilities: [
+            "Facilitated collaborative coding initiatives and hackathon prep groups",
+            "Championed active feedback loops between student engineers and industry mentors",
+            "Conducted interactive architectural workshops on system fundamentals"
+          ],
+          tech: ["Technical Outreach", "Community Engagement", "Public Speaking", "Mentorship"]
+        },
+        {
+          badge: "AI RESEARCH",
+          title: "FLYRANK AI",
+          place: "AI Intern · Research & Implementation (2026)",
+          note: "Explored practical generative AI workflows, agentic prompt patterns, and model evaluation techniques. Integrated prompt-based automation pipelines to accelerate developer workflows.",
+          capabilities: [
+            "Constructed prompt-based automation pipelines for developer workflow acceleration",
+            "Analyzed foundational LLM mechanics, embeddings, and context window optimizations",
+            "Explored model evaluation metrics and structured synthetic data generation"
+          ],
+          tech: ["Generative AI", "Prompt Engineering", "LLM Workflows", "AI Fluency", "Applied NLP"]
+        },
+        {
+          badge: "SECURITY",
+          title: "0xSHUNYA",
+          place: "Member & Security Researcher · Cybersecurity (2026)",
+          note: "Hands-on cybersecurity research, vulnerability assessments, and collaborative problem-solving. Practiced threat modeling, Linux system hardening, and network packet analysis.",
+          capabilities: [
+            "Executed Linux system hardening and perimeter vulnerability assessments",
+            "Practiced network packet inspection and threat modeling in capture-the-flag exercises",
+            "Collaborated on defensive security tooling and automated shell scripts"
+          ],
+          tech: ["Cybersecurity", "Linux Hardening", "Network Security", "Threat Modeling", "Shell Scripting"]
+        },
+        {
+          badge: "ACADEMIC",
+          title: "IIT JODHPUR",
+          place: "B.S. in Applied AI and Data Science · Class of 2029",
+          note: "Rigorous foundations in Machine Learning, Mathematics, Data Engineering, and Computational Theory. Focus on scalable intelligence, relational systems, and applied AI software engineering.",
+          capabilities: [
+            "Advanced mathematical modeling, statistical learning, and calculus foundations",
+            "Algorithms, data structures, and computational complexity theory",
+            "Applied machine learning pipelines and distributed data architecture"
+          ],
+          tech: ["Machine Learning", "Mathematics", "Data Engineering", "Computational Theory"]
+        },
+        {
+          badge: "FELLOWSHIP",
+          title: "LEAPSTART TRAINING",
+          place: "Professional Technology Training Program · Active",
+          note: "Immersive project-driven training across full-stack systems, modern databases, and enterprise tooling with continuous peer code reviews.",
+          capabilities: [
+            "Full-stack microservices architecture and client-server synchronization",
+            "PostgreSQL index optimization, transaction isolation, and query plans",
+            "Modern frontend state management and reactive design patterns"
+          ],
+          tech: ["Full Stack", "Distributed Systems", "Database Optimization", "Enterprise Tooling"]
+        },
+        {
+          badge: "CREDENTIAL",
+          title: "ONE MILLION PROMPTERS",
+          place: "Dubai Government Credential · DXB-OMP-2026",
+          note: "Verified credential certifying mastery in advanced generative AI prompting, agentic decomposing architectures, and systematic LLM steering.",
+          capabilities: [
+            "Few-shot prompt calibration and chain-of-thought orchestration",
+            "Context window efficiency and structured JSON output guarantees",
+            "Agent persona steering for complex code generation tasks"
+          ],
+          tech: ["Prompt Engineering", "LLM Steering", "Agentic Prompts", "AI Fluency"]
+        },
+        {
+          badge: "SIMULATION",
+          title: "DELOITTE AUSTRALIA",
+          place: "Data Analytics Job Simulation · DLT-AU-DATA",
+          note: "Industry-grade data analytics simulation: extracting business intelligence from enterprise telemetry datasets and structuring executive insights.",
+          capabilities: [
+            "Data pipeline transformation and metric extraction",
+            "Executive presentation storytelling and interactive analytics dashboards",
+            "Strategic roadmap recommendations based on empirical telemetry"
+          ],
+          tech: ["Data Analytics", "Strategic Intelligence", "Telemetry Metrics", "Dashboards"]
+        },
+        {
+          badge: "CREDENTIAL",
+          title: "ANTHROPIC AI FLUENCY",
+          place: "Framework and Foundations · ANTH-AIF-2026",
+          note: "Comprehensive certification covering foundational LLM mechanics, constitutional AI principles, prompt framing, and production agent safety.",
+          capabilities: [
+            "Constitutional AI and safety evaluation frameworks",
+            "Multi-turn agent state management and tool synthesis",
+            "Context window retrieval augmentation and embedding dynamics"
+          ],
+          tech: ["Claude API", "LLM Mechanics", "AI Safety", "Agent Architectures"]
+        },
+        {
+          badge: "CREDENTIAL",
+          title: "MICROSOFT SOC PROGRAM",
+          place: "Student SOC Foundations · MSFT-SOC-FOUND",
+          note: "Cybersecurity operations foundation: network traffic forensics, security information and event management (SIEM), and incident triage.",
+          capabilities: [
+            "Security event correlation and firewall rule triage",
+            "PCAP network packet inspection and anomalous flow isolation",
+            "Defensive infrastructure hardening and operational response playbooks"
+          ],
+          tech: ["Security Operations", "SOC Forensics", "Incident Response", "Network Security"]
+        },
+        {
+          badge: "CRAFT",
+          title: "TECHNICAL DEMOS",
+          place: "Precision & Clarity · 60-Second Walkthroughs",
+          note: "Code is only half the craft; communication is the multiplier. If you cannot explain a complex distributed system in 60 seconds without slides, you haven't mastered its mechanics.",
+          capabilities: [
+            "Delivering high-density, crystal-clear live system walkthroughs",
+            "Deconstructing complex algorithms into intuitive first-principles models",
+            "Live code execution and real-time failure-mode diagnosis"
+          ],
+          tech: ["Architecture Walkthroughs", "Technical Storytelling", "Communication Craft"]
+        },
+        {
+          badge: "CHARISMA",
+          title: "STAND-UP COMEDY",
+          place: "Narrative, Rhythm & Stage Presence · Craft",
+          note: "Bringing observational timing, rhythm, and storytelling from stand-up comedy to technical engineering presentations. Breaking complex engineering tension with relatable, sharp narratives.",
+          capabilities: [
+            "Translating intimidating technical jargon into human, resonant analogies",
+            "Mastering stage presence, audience cadence, and comic timing",
+            "Engaging developer audiences during technical keynotes and conferences"
+          ],
+          tech: ["Stand-Up Comedy", "Stage Presence", "Rhythm & Timing", "Public Speaking"]
+        },
+        {
+          badge: "COMMUNITY",
+          title: "COMMUNITY LEADERSHIP",
+          place: "Developer Circles & Hackathons · Outreach",
+          note: "Spearheading developer learning circles, hackathon prep groups, and hands-on workshops. Bridging the gap between raw student curiosity and production-grade engineering practices.",
+          capabilities: [
+            "Mentoring aspiring student engineers in full-stack architecture",
+            "Organizing collaborative coding circles and hackathon teams",
+            "Hosting hands-on workshops on databases, AI agents, and security"
+          ],
+          tech: ["Community Building", "Peer Mentorship", "Hackathon Prep", "Tech Workshops"]
+        },
+        {
+          badge: "VELOCITY",
+          title: "48-HOUR RIGOR",
+          place: "Rapid Prototyping & Distributed Synthesis",
+          note: "Thriving under high-pressure rapid synthesis sprints. Turning ambiguous problem statements into working full-stack prototypes, structured schemas, and functional AI agents overnight.",
+          capabilities: [
+            "Zero-to-one architecture synthesis under intense time constraints",
+            "Rapid schema normalization and instant API scaffold generation",
+            "Autonomous multi-agent orchestration for overnight prototype delivery"
+          ],
+          tech: ["Rapid Prototyping", "Full Stack Synthesis", "Agile Hacking", "AI Swarms"]
+        }
+      ];
+
+      // STATE & REFS
+      const N = 21;
+      const GA = Math.PI * (3 - Math.sqrt(5));
+      const cardBlobs = new Array(N).fill(null);
+      let loadedAssets = 0;
+      const totalAssets = N; // 21 tech stills
+
+      const orbEl = document.getElementById("orb");
+      const worldEl = document.getElementById("world");
+      const stageEl = document.getElementById("stage");
+      const headlineEl = document.getElementById("headline");
+      const gridRowsEl = document.getElementById("gridRows");
+      const progressBar = document.getElementById("bar");
+      const splashEl = document.getElementById("splash");
+      const introEl = document.getElementById("intro");
+      const skipBtn = document.getElementById("skip");
+      const menuBtn = document.getElementById("menuBtn");
+      const gridBtn = document.getElementById("gridBtn");
+      const litEl = document.getElementById("lit");
+      const litPlate = document.getElementById("litPlate");
+      const litImg = document.getElementById("litImg");
+      const litTitle = document.getElementById("litTitle");
+      const litWhere = document.getElementById("litWhere");
+      const litNote = document.getElementById("litNote");
+      const litTags = document.getElementById("litTags");
+      const litRepo = document.getElementById("litRepo");
+      const litExtra = document.getElementById("litExtra");
+      const dot = document.getElementById("dot");
+
+      let R = 320;
+      let cw = 150;
+      let persp = 1150;
+      const cardNodes = [];
+      const gridNodes = [];
+      const unitVectors = [];
+
+      // CAMERA LOOP STATE
+      let spin = 0, tilt = -4, camZ = 0;
+      let dragX = 0, dragY = 0;
+      let velX = 0, velY = 0;
+      const PITCH_LIMIT = 32;
+      let isDragging = false;
+      let isLit = false;
+      let focusedIdx = -1;
+      let sourceCardEl = null;
+      let openToken = 0;
+
+      // Calculate responsive values
+      function calculateDimensions() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+
+        const hr = w <= 380 ? 0.38 : (w <= 640 ? 0.42 : 0.46);
+        const wr = w <= 380 ? 0.48 : (w <= 640 ? 0.52 : 0.58);
+        const floor = w <= 380 ? 108 : (w <= 640 ? 120 : 155);
+        R = Math.max(floor, Math.min(480, h * hr, w * wr));
+
+        const scale = w <= 380 ? 0.44 : (w <= 640 ? 0.46 : 0.47);
+        cw = Math.round(Math.max(72, R * scale));
+
+        persp = w <= 380 ? 620 : (w <= 640 ? 760 : (w <= 900 ? 920 : 1150));
+        document.documentElement.style.setProperty("--persp", persp + "px");
+        document.documentElement.style.setProperty("--cw", cw + "px");
+      }
+
+      calculateDimensions();
+
+      // BUILD FIBONACCI UNIT VECTORS & CARDS
+      for (let i = 0; i < N; i++) {
+        const y = 1 - (i / (N - 1)) * 2;
+        const rad = Math.sqrt(Math.max(0, 1 - y * y));
+        const theta = i * GA;
+        const x = Math.cos(theta) * rad;
+        const z = Math.sin(theta) * rad;
+        const lat = Math.asin(y) * (180 / Math.PI);
+        const lon = Math.atan2(x, z) * (180 / Math.PI);
+
+        unitVectors.push({ x, y, z, lat, lon });
+
+        const item = DOSSIER_ITEMS[i];
+
+        // 3D Sphere Card
+        const card = document.createElement("div");
+        card.className = "card" + (i === 18 ? " tall" : ""); // card 19 (index 18) is Stand-Up Comedy
+        card.dataset.idx = i;
+        card.innerHTML = `
+          <figure>
+            <span class="card-badge">${item.badge}</span>
+            <img alt="${item.title}">
+            <div class="card-label">${item.title}</div>
+          </figure>
+        `;
+        card.addEventListener("click", () => {
+          if (movedDist < 10) {
+            openLightbox(i, card);
+          }
+        });
+        orbEl.appendChild(card);
+        cardNodes.push(card);
+
+        // Flat Grid item
+        const figure = document.createElement("figure");
+        figure.dataset.idx = i;
+        figure.innerHTML = `
+          <img alt="${item.title}">
+          <figcaption>
+            <div class="fig-title">${item.title}</div>
+            <div class="fig-sub">${item.place}</div>
+          </figcaption>
+        `;
+        figure.addEventListener("click", () => {
+          openLightbox(i, figure);
+        });
+        gridRowsEl.appendChild(figure);
+        gridNodes.push(figure);
+      }
+
+      function layoutSphereCards() {
+        for (let i = 0; i < N; i++) {
+          const v = unitVectors[i];
+          const card = cardNodes[i];
+          const tx = (v.x * R).toFixed(2);
+          const ty = (-v.y * R).toFixed(2);
+          const tz = (v.z * R).toFixed(2);
+          card.style.transform = `translate3d(${tx}px, ${ty}px, ${tz}px) rotateY(${v.lon.toFixed(2)}deg) rotateX(${v.lat.toFixed(2)}deg)`;
+        }
+      }
+
+      layoutSphereCards();
+
+      // ASSET DECODING & CANVAS DOWNSCALING FOR TECH IMAGES
+      function getDecodeMax() {
+        const w = window.innerWidth;
+        return w <= 380 ? 420 : (w <= 640 ? 520 : (w <= 900 ? 640 : 760));
+      }
+
+      function updateProgress() {
+        loadedAssets++;
+        const pct = Math.min(1, loadedAssets / totalAssets);
+        if (progressBar) {
+          progressBar.style.transform = `scaleX(${pct})`;
+        }
+        if (loadedAssets >= totalAssets) {
+          onAllAssetsReady();
+        }
+      }
+
+      // Preload and decode 21 tech images
+      TECH_IMAGES.forEach((url, idx) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = url;
+
+        img.onload = function () {
+          try {
+            const cardMax = getDecodeMax();
+            const nw = img.naturalWidth;
+            const nh = img.naturalHeight;
+            if (nw <= cardMax && nh <= cardMax) {
+              cardBlobs[idx] = url;
+              assignCardImage(idx, url);
+            } else {
+              const scale = Math.min(1, cardMax / Math.max(nw, nh));
+              const cvs = document.createElement("canvas");
+              cvs.width = Math.round(nw * scale);
+              cvs.height = Math.round(nh * scale);
+              const ctx = cvs.getContext("2d");
+              ctx.drawImage(img, 0, 0, cvs.width, cvs.height);
+              cvs.toBlob(blob => {
+                if (blob) {
+                  const bUrl = URL.createObjectURL(blob);
+                  cardBlobs[idx] = bUrl;
+                  assignCardImage(idx, bUrl);
+                } else {
+                  cardBlobs[idx] = url;
+                  assignCardImage(idx, url);
+                }
+              }, "image/webp", 0.88);
+            }
+          } catch (err) {
+            cardBlobs[idx] = url;
+            assignCardImage(idx, url);
+          }
+          updateProgress();
+        };
+
+        img.onerror = function () {
+          cardBlobs[idx] = url;
+          assignCardImage(idx, url);
+          updateProgress();
+        };
+      });
+
+      function assignCardImage(idx, src) {
+        const cImg = cardNodes[idx].querySelector("img");
+        if (cImg) {
+          cImg.src = src;
+          cImg.classList.add("in");
+        }
+        const gImg = gridNodes[idx].querySelector("img");
+        if (gImg) {
+          gImg.src = src;
+        }
+      }
+
+      // SPLASH & REVEAL LOGIC
+      let splashDone = false;
+      const birthTime = Date.now();
+
+      function onAllAssetsReady() {
+        if (splashDone) return;
+        const elapsed = Date.now() - birthTime;
+        const wait = Math.max(0, 750 - elapsed);
+        setTimeout(dismissSplash, wait);
+      }
+
+      // Absolute backstop 3500ms
+      setTimeout(() => {
+        if (!splashDone) dismissSplash();
+      }, 3500);
+
+      function dismissSplash() {
+        if (splashDone) return;
+        splashDone = true;
+        if (progressBar) progressBar.style.transform = "scaleX(1)";
+
+        setTimeout(() => {
+          if (splashEl) splashEl.classList.add("out");
+          revealArchive();
+
+          setTimeout(() => {
+            if (splashEl && splashEl.parentNode) {
+              splashEl.parentNode.removeChild(splashEl);
+            }
+            if (introEl && introEl.parentNode) {
+              introEl.parentNode.removeChild(introEl);
+            }
+          }, 850);
+        }, 250);
+      }
+
+      if (skipBtn) {
+        skipBtn.addEventListener("click", revealArchive);
+      }
+
+
+      let revealed = false;
+
+      function revealArchive() {
+        if (revealed) return;
+        revealed = true;
+
+        introEl.classList.add("closing");
+        document.body.classList.remove("locked");
+        document.documentElement.style.overflow = "";
+
+        // Measure/layout sphere twice inside black veil
+        calculateDimensions();
+        layoutSphereCards();
+        requestAnimationFrame(() => {
+          calculateDimensions();
+          layoutSphereCards();
+        });
+
+        setTimeout(() => {
+          calculateDimensions();
+          layoutSphereCards();
+          document.body.classList.add("revealed");
+          introEl.classList.add("gone");
+
+          setTimeout(() => {
+            if (introEl && introEl.parentNode) {
+              introEl.parentNode.removeChild(introEl);
+            }
+          }, 700);
+        }, 1000);
+      }
+
+      // CAMERA RAF LOOP
+      function cameraLoop() {
+        if (!isDragging && !isLit) {
+          dragX += velX;
+          dragY += velY;
+          velX *= 0.94;
+          velY *= 0.94;
+
+          if (Math.abs(velX) < 0.002) velX = 0;
+          if (Math.abs(velY) < 0.002) velY = 0;
+
+          if (tilt + dragY > PITCH_LIMIT) dragY = PITCH_LIMIT - tilt;
+          if (tilt + dragY < -PITCH_LIMIT) dragY = -PITCH_LIMIT - tilt;
+        }
+
+        // 16vh scroll clamp & progress
+        const maxScroll = window.innerHeight * 0.16;
+        if (window.scrollY > maxScroll) {
+          window.scrollTo(0, maxScroll);
+        }
+        const p = Math.min(1, Math.max(0, window.scrollY / Math.max(1, maxScroll)));
+
+        if (p > 0.05) {
+          document.body.classList.add("deep");
+        } else {
+          document.body.classList.remove("deep");
+        }
+
+        // Dolly zoom target
+        const camZTarget = p * Math.min(64, R * 0.12);
+        camZ += (camZTarget - camZ) * 0.075;
+
+        const sx = tilt + dragY;
+        const sy = spin + dragX;
+
+        // Apply transform to world
+        worldEl.style.transform = `translateZ(${camZ.toFixed(2)}px) rotateY(${sy.toFixed(2)}deg) rotateX(${sx.toFixed(2)}deg)`;
+
+        // HEADLINE TRANSFORM: MANDATORY ORDER
+        headlineEl.style.transform = `rotateX(${-sx.toFixed(2)}deg) rotateY(${-sy.toFixed(2)}deg) translateZ(${(R * 0.62).toFixed(2)}px)`;
+        headlineEl.style.opacity = Math.max(0, 1 - p * 0.55).toFixed(3);
+
+        // CARD DEPTH & FADING
+        const sxRad = (sx * Math.PI) / 180;
+        const syRad = (sy * Math.PI) / 180;
+        const cosX = Math.cos(sxRad);
+        const sinX = Math.sin(sxRad);
+        const cosY = Math.cos(syRad);
+        const sinY = Math.sin(syRad);
+
+        const near = persp * 0.66;
+        const shade = 1 - Math.min(1, p * 1.6);
+
+        for (let i = 0; i < N; i++) {
+          const u = unitVectors[i];
+
+          // Pitch around X:
+          const y1 = u.y * cosX - u.z * sinX;
+          const z1 = u.y * sinX + u.z * cosX;
+          const x1 = u.x;
+
+          // Yaw around Y:
+          const z2 = -x1 * sinY + z1 * cosY;
+          const zf = z2; // depth in [-1, 1]
+
+          const base = 0.14 + 0.86 * Math.pow((zf + 1) / 2, 0.85);
+          let dim = shade * (1 - base);
+          const curZ = zf * R + camZ;
+          let fade = curZ > near ? Math.max(0, 1 - (Math.abs(curZ) - near) / 190) : 1;
+
+          if (isLit) {
+            dim = Math.min(1, dim + 0.78);
+            if (i === focusedIdx) {
+              fade = 0;
+            }
+          }
+
+          const card = cardNodes[i];
+          const fadeStr = fade.toFixed(3);
+          const dimStr = dim.toFixed(3);
+
+          if (card._lastFade !== fadeStr) {
+            card.style.opacity = fadeStr;
+            card._lastFade = fadeStr;
+          }
+          if (card._lastDim !== dimStr) {
+            card.style.setProperty("--d", dimStr);
+            card._lastDim = dimStr;
+          }
+        }
+
+        requestAnimationFrame(cameraLoop);
+      }
+
+      // Synchronous layout & kick off loop
+      calculateDimensions();
+      layoutSphereCards();
+      requestAnimationFrame(cameraLoop);
+
+      // DRAG GESTURE INTERACTIONS
+      let pointerDown = false;
+      let startX = 0, startY = 0;
+      let lastX = 0, lastY = 0;
+      let movedDist = 0;
+      let cardAtDown = null;
+
+      stageEl.addEventListener("pointerdown", e => {
+        if (isLit) return;
+        pointerDown = true;
+        cardAtDown = e.target.closest(".card");
+        startX = e.clientX;
+        startY = e.clientY;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        movedDist = 0;
+
+        if (e.pointerType !== "touch") {
+          stageEl.setPointerCapture(e.pointerId);
+          isDragging = true;
+          velX = 0;
+          velY = 0;
+        }
+      });
+
+      stageEl.addEventListener("pointermove", e => {
+        if (!pointerDown) return;
+        const dx = e.clientX - lastX;
+        const dy = e.clientY - lastY;
+        const totalDx = e.clientX - startX;
+        const totalDy = e.clientY - startY;
+        movedDist = Math.hypot(totalDx, totalDy);
+
+        if (e.pointerType === "touch" && !isDragging) {
+          if (movedDist > 10) {
+            if (Math.abs(totalDy) > Math.abs(totalDx) * 1.15) {
+              // Let the page scroll
+              pointerDown = false;
+              return;
+            } else {
+              try {
+                stageEl.setPointerCapture(e.pointerId);
+              } catch (err) {}
+              isDragging = true;
+              velX = 0;
+              velY = 0;
+            }
+          }
+        }
+
+        if (isDragging) {
+          dragX += dx * 0.13;
+          dragY -= dy * 0.13;
+
+          if (tilt + dragY > PITCH_LIMIT) dragY = PITCH_LIMIT - tilt;
+          if (tilt + dragY < -PITCH_LIMIT) dragY = -PITCH_LIMIT - tilt;
+
+          velX = dx * 0.13;
+          velY = -dy * 0.13;
+
+          lastX = e.clientX;
+          lastY = e.clientY;
+        }
+      });
+
+      function onPointerEnd(e) {
+        if (!pointerDown) return;
+        pointerDown = false;
+        try {
+          stageEl.releasePointerCapture(e.pointerId);
+        } catch (err) {}
+
+        const slop = e.pointerType === "touch" ? 14 : 6;
+        if (movedDist < slop && cardAtDown) {
+          const idx = parseInt(cardAtDown.dataset.idx, 10);
+          openLightbox(idx, cardAtDown);
+        }
+
+        isDragging = false;
+        cardAtDown = null;
+      }
+
+      stageEl.addEventListener("pointerup", onPointerEnd);
+      stageEl.addEventListener("pointercancel", onPointerEnd);
+
+      // LIGHTBOX POPULATE & FLIP
+      function populateLightbox(idx) {
+        const item = DOSSIER_ITEMS[idx];
+        if (!item) return;
+
+        litTitle.textContent = item.title;
+        litWhere.textContent = item.place;
+        litNote.textContent = item.note;
+
+        // Tags
+        if (item.tech && item.tech.length > 0) {
+          litTags.innerHTML = item.tech.map(t => `<span class="tech-tag">${t}</span>`).join("");
+        } else {
+          litTags.innerHTML = "";
+        }
+
+        // Repository link
+        if (item.repo) {
+          litRepo.innerHTML = `<a href="${item.repo}" target="_blank" rel="noopener noreferrer" class="repo-link">View Architecture &amp; Code ↗</a>`;
+        } else {
+          litRepo.innerHTML = "";
+        }
+
+        // Capabilities & problem breakdown
+        let extraHtml = "";
+        if (item.problem) {
+          extraHtml += `<div class="section-sub"><strong>The Problem:</strong> ${item.problem}</div>`;
+        }
+        if (item.approach) {
+          extraHtml += `<div class="section-sub" style="margin-top:8px"><strong>Technical Approach:</strong> ${item.approach}</div>`;
+        }
+        if (item.capabilities && item.capabilities.length > 0) {
+          extraHtml += `<div class="section-sub" style="margin-top:10px"><strong>Key Subsystems &amp; Mechanics:</strong></div><ul style="padding-left:18px; margin-top:6px; line-height:1.6">`;
+          item.capabilities.forEach(cap => {
+            extraHtml += `<li>${cap}</li>`;
+          });
+          extraHtml += `</ul>`;
+        }
+        litExtra.innerHTML = extraHtml;
+      }
+
+      function openLightbox(idx, sourceEl) {
+        focusedIdx = idx;
+        isLit = true;
+        sourceCardEl = sourceEl;
+        const myToken = ++openToken;
+
+        populateLightbox(idx);
+
+        // Show image immediately
+        const imgSrc = cardBlobs[idx] || TECH_IMAGES[idx];
+        litImg.src = imgSrc;
+
+        document.body.classList.add("lit");
+
+        // FLIP animation
+        const sourceFig = sourceEl ? (sourceEl.querySelector("figure") || sourceEl) : null;
+        const startRect = sourceFig ? sourceFig.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight / 2, width: 100, height: 100 };
+        const shotEl = litPlate.querySelector(".shot");
+        const endRect = shotEl.getBoundingClientRect();
+        const endW = endRect.width > 0 ? endRect.width : (litPlate.getBoundingClientRect().width || 600);
+        const endH = endRect.height > 0 ? endRect.height : (endW / 1.5);
+
+        litPlate.style.transition = "none";
+        const dx = (startRect.left + startRect.width / 2) - (endRect.left + endW / 2);
+        const dy = (startRect.top + startRect.height / 2) - (endRect.top + endH / 2);
+        const scale = Math.max(0.04, startRect.width / endW);
+
+        litPlate.style.transform = `translate(${dx.toFixed(2)}px, ${dy.toFixed(2)}px) scale(${scale.toFixed(4)})`;
+        litPlate.style.opacity = "0";
+
+        litPlate.offsetHeight; // force reflow
+
+        litPlate.style.transition = "";
+        litPlate.style.transform = "";
+        litPlate.style.opacity = "";
+      }
+
+      function closeLightbox() {
+        if (!isLit) return;
+        focusedIdx = -1;
+        document.body.classList.remove("lit");
+
+        const targetFig = sourceCardEl ? (sourceCardEl.querySelector("figure") || sourceCardEl) : null;
+        if (targetFig) {
+          const targetRect = targetFig.getBoundingClientRect();
+          const shotEl = litPlate.querySelector(".shot");
+          const curRect = shotEl.getBoundingClientRect();
+          const curW = curRect.width > 0 ? curRect.width : 600;
+          const curH = curRect.height > 0 ? curRect.height : 400;
+          const dx = (targetRect.left + targetRect.width / 2) - (curRect.left + curW / 2);
+          const dy = (targetRect.top + targetRect.height / 2) - (curRect.top + curH / 2);
+          const scale = Math.max(0.04, targetRect.width / curW);
+
+          litPlate.style.transform = `translate(${dx.toFixed(2)}px, ${dy.toFixed(2)}px) scale(${scale.toFixed(4)})`;
+          litPlate.style.opacity = "0";
+        }
+
+        setTimeout(() => {
+          litPlate.style.transition = "none";
+          litPlate.style.transform = "";
+          litPlate.style.opacity = "";
+          isLit = false;
+          sourceCardEl = null;
+        }, 640);
+      }
+
+      document.querySelectorAll("[data-close]").forEach(el => {
+        el.addEventListener("click", closeLightbox);
+      });
+
+      gridBtn.addEventListener("click", () => {
+        document.body.classList.toggle("gridview");
+      });
+
+      // FULLSCREEN MENU
+      function openMenu() {
+        document.body.classList.add("menu-open");
+        menuBtn.setAttribute("aria-expanded", "true");
+        menuBtn.setAttribute("aria-label", "Close menu");
+      }
+
+      function closeMenu() {
+        document.body.classList.remove("menu-open");
+        menuBtn.setAttribute("aria-expanded", "false");
+        menuBtn.setAttribute("aria-label", "Open menu");
+      }
+
+      menuBtn.addEventListener("click", () => {
+        if (document.body.classList.contains("menu-open")) {
+          closeMenu();
+        } else {
+          openMenu();
+        }
+      });
+
+      document.querySelectorAll("[data-close-menu]").forEach(link => {
+        link.addEventListener("click", e => {
+          e.preventDefault();
+          closeMenu();
+        });
+      });
+
+      document.querySelector("[data-grid]").addEventListener("click", e => {
+        e.preventDefault();
+        closeMenu();
+        document.body.classList.add("gridview");
+      });
+
+      // KEYBOARD ESCAPE HIERARCHY
+      window.addEventListener("keydown", e => {
+        if (e.key === "Escape") {
+          if (document.body.classList.contains("lit")) {
+            closeLightbox();
+          } else if (document.body.classList.contains("menu-open")) {
+            closeMenu();
+          } else if (document.body.classList.contains("gridview")) {
+            document.body.classList.remove("gridview");
+          }
+        }
+      });
+
+      // CUSTOM CURSOR LERP
+      let cursorX = window.innerWidth / 2;
+      let cursorY = window.innerHeight / 2;
+      let targetX = cursorX;
+      let targetY = cursorY;
+
+      window.addEventListener("pointermove", e => {
+        targetX = e.clientX;
+        targetY = e.clientY;
+      }, { passive: true });
+
+      function cursorLoop() {
+        cursorX += (targetX - cursorX) * 0.2;
+        cursorY += (targetY - cursorY) * 0.2;
+        dot.style.transform = `translate3d(${cursorX.toFixed(2)}px, ${cursorY.toFixed(2)}px, 0)`;
+        requestAnimationFrame(cursorLoop);
+      }
+      requestAnimationFrame(cursorLoop);
+
+      // Cursor expansion on interactive items
+      const interactives = ".card, a, button, #grid figure";
+      document.addEventListener("mouseover", e => {
+        if (e.target.closest(interactives)) {
+          dot.classList.add("wide");
+        }
+      });
+      document.addEventListener("mouseout", e => {
+        if (e.target.closest(interactives)) {
+          dot.classList.remove("wide");
+        }
+      });
+
+      // RESIZE HANDLING
+      let lastW = window.innerWidth;
+      let lastH = window.innerHeight;
+
+      function onWindowResize() {
+        const curW = window.innerWidth;
+        const curH = window.innerHeight;
+        if (Math.abs(curW - lastW) < 20 && Math.abs(curH - lastH) < 20) {
+          return;
+        }
+        lastW = curW;
+        lastH = curH;
+        calculateDimensions();
+        layoutSphereCards();
+      }
+
+      window.addEventListener("resize", onWindowResize);
+      window.addEventListener("orientationchange", () => {
+        setTimeout(onWindowResize, 220);
+      });
+
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener("resize", onWindowResize);
+      }
+
+    })();
+  </script>
+</body>
+</html>
